@@ -3,7 +3,7 @@ using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Tag your music using the latest search result",
-                         options: "!create|!view-group-by-artist",
+                         options: "tags|!create|!view-group-by-artist",
                          example: "tag")]
 public class TagCommand : SpotifyBaseCommando
 {
@@ -25,6 +25,14 @@ public class TagCommand : SpotifyBaseCommando
         }
         var tag = GetOptionValue("create");
         _taggedTracks = StorageService<TaggedTracks>.Service.GetObject();
+        if (HasOption("tags"))
+        {
+            foreach (var tagName in _taggedTracks.Tracks.Select(t => t.Tags).Distinct())
+            {
+                WriteLine(tagName);
+            }
+            return Ok();
+        }
         foreach (var track in LastSearch)
         {
             var existing = SpotifyDB.Tracks.FirstOrDefault(t => t.Id == track.Id);
