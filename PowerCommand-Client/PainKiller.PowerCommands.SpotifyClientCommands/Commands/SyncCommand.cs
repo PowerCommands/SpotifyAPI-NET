@@ -28,9 +28,10 @@ public class SyncCommand : SpotifyBaseCommando
         }
         SpotifyDB.Playlists.AddRange(_playlists);
         SpotifyDB.Updated = DateTime.Now;
+        SyncTags();
         StorageService<SpotifyDB>.Service.StoreObject(SpotifyDB);
-        WriteSuccessLine("The playlist are now downloaded and stored locally");
-        WriteLine(ConfigurationGlobals.Prompt);
+        WriteSuccessLine("The playlist are now downloaded and stored locally, earlier stored tags (if any) are restored.");
+        Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
     private async Task<List<SimplePlaylist>> EnumeratePlaylistsAsync(Paging<SimplePlaylist> page)
@@ -49,12 +50,18 @@ public class SyncCommand : SpotifyBaseCommando
             if (item.Track is FullTrack track)
             {
                 Console.WriteLine($"{track.Artists.First().Name} {track.Name}");
-                var pcTrack = new PowerCommandTrack(track);
+                var pcTrack = new PowerCommandTrack(track, pcPlaylist.Name);
                 pcPlaylist.Tracks.Add(pcTrack);
                 if (SpotifyDB.Tracks.All(t => t.Id != track.Id))
                 {
                     SpotifyDB.Tracks.Add(pcTrack);
                 }
             }
+    }
+
+    private void SyncTags()
+    {
+        var taggedTracks = StorageService<TaggedTracks>.Service.GetObject();
+        foreach (var powerCommandTrack in SpotifyDB.Tracks.Where(powerCommandTrack => taggedTracks.Tracks.Any(t => t.Id == powerCommandTrack.Id))) powerCommandTrack.Tags = taggedTracks.Tracks.First(t => t.Id == powerCommandTrack.Id).Tags;
     }
 }

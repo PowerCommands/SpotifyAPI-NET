@@ -4,9 +4,10 @@ using SpotifyAPI.Web;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfiguration>
 {
-    protected static bool NoClient;
+    protected bool NoClient;
     protected static SpotifyDB SpotifyDB = new();
     protected SpotifyClient? Client;
+    protected static List<PowerCommandTrack> LastSearch = new();
     protected SpotifyBaseCommando(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
@@ -21,4 +22,15 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         }
         return base.InitializeAndValidateInput(input, designAttribute);
     }
+
+    protected void Print(List<PowerCommandTrack> tracks)
+    {
+        LastSearch.AddRange(tracks);
+        var table = tracks.Select(t => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags });
+        ConsoleTableService.RenderTable(table, this);
+        WriteHeadLine($"Found {tracks.Count} tracks");
+        Write("You could create a playlist using this search result with the following command:");
+        WriteCodeExample("playlist","--create <name> --from-search");
+    }
+    protected List<PowerCommandTrack> SearchTag(string search) => SpotifyDB.Tracks.Where(t => t.Tags.ToLower().Contains(search)).ToList();
 }

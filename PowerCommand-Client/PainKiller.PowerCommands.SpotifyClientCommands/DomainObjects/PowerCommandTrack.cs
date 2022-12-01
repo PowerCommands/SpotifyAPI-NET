@@ -5,7 +5,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 public class PowerCommandTrack
 {
     public PowerCommandTrack(){}
-    public PowerCommandTrack(FullTrack track)
+    public PowerCommandTrack(FullTrack track, string playlistName)
     {
         Artist = track.Artists.FirstOrDefault() == null ? "?" : track.Artists.First().Name;
         Id = track.Id;
@@ -18,6 +18,7 @@ public class PowerCommandTrack
         IsPlayable = track.IsPlayable;
         AlbumName = track.Album.Name;
         ReleaseDate = track.Album.ReleaseDate;
+        PlaylistName = playlistName;
     }
     public string Artist { get; set; } = "";
     public int DurationMs { get; set; }
@@ -29,6 +30,8 @@ public class PowerCommandTrack
     public string Uri { get; set; } = default!;
     public bool IsLocal { get; set; }
     public string AlbumName { get; set; } = "";
+    public string PlaylistName { get; set; } = "";
     public string ReleaseDate { get; set; } = "";
+    public string Tags { get; set; } = "";
     public int ReleaseYear => int.TryParse($"{ReleaseDate}".Length > 3 ? ReleaseDate.Substring(0,4) : "0", out var year) ? year : 0;
 }

@@ -14,7 +14,7 @@ public class TokenCommand : CommandBase<PowerCommandsConfiguration>
     {
         if (HasOption("save"))
         {
-            var token = DialogService.QuestionAnswerDialog("Token:");
+            var token = DialogService.QuestionAnswerDialog("Token (playlist-read-private and playlist-modify-private):");
             StorageService<Token>.Service.StoreObject(new Token { OathToken = token });
             WriteSuccessLine("Token saved");
         }

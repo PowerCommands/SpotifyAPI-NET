@@ -3,9 +3,9 @@ using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandTest(         tests: " ")]
-[PowerCommandDesign( description: "Search Spotify catalog or your locally stored playlists",
-                          quotes: "<search>",
-                         options: "title|artist|album|!year",
+[PowerCommandDesign( description: "Search Spotify catalog or your locally stored play-lists, default search is on artist",
+                       arguments: "<search1> <search2>",
+                         options: "title|album|!year|!tag|artist",
                          example: "search \"Iron maiden\"")]
 public class SearchCommand : SpotifyBaseCommando
 {
@@ -20,13 +20,21 @@ public class SearchCommand : SpotifyBaseCommando
     public override RunResult Run()
     {
         DisableLog();
+        
+        LastSearch.Clear();
+
         var findings = new List<PowerCommandTrack>();
-        var search = string.IsNullOrEmpty(Input.SingleQuote) ? Input.SingleArgument : Input.SingleQuote;
+        var search = Input.SingleQuote.ToLower();
+        if (string.IsNullOrEmpty(search) && Input.Options.Length == 0) search = string.Join(' ', Input.Arguments);
 
-        if(HasOption("artist")) findings.AddRange(SearchArtist(search));
+
+        if (!Input.MustHaveOneOfTheseOptionCheck(new[] { "artist", "title", "album" }) && string.IsNullOrEmpty(Input.SingleQuote)) return BadParameterError("A search on artist, title or album could not be empty");
+
+        if(HasOption("title")) findings.AddRange(SearchTitle(search));
         else if(HasOption("album")) findings.AddRange(SearchAlbum(search));
-        else if(HasOption("title")) findings.AddRange(SearchTitle(search));
-
+        else if(HasOption("tag")) findings.AddRange(SearchTag(GetOptionValue("tag")));
+        else findings.AddRange(SearchArtist(search));
+        
         if(HasOption("year")) findings = findings.Where(f => f.ReleaseYear == Input.OptionToInt("year")).ToList();
 
         Print(findings);
@@ -38,12 +46,4 @@ public class SearchCommand : SpotifyBaseCommando
     private List<PowerCommandTrack> SearchArtist(string search) => SpotifyDB.Tracks.Where(t => t.Artist.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchTitle(string search) => SpotifyDB.Tracks.Where(t => t.Name.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchAlbum(string search) => SpotifyDB.Tracks.Where(t => t.AlbumName.ToLower().Contains(search)).ToList();
-
-    private void Print(List<PowerCommandTrack> tracks)
-    {
-        var table = tracks.Select(t => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate });
-        ConsoleTableService.RenderTable(table, this);
-        WriteHeadLine($"Found {tracks.Count} tracks");
-    }
-
 }
