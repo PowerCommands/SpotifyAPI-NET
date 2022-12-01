@@ -3,8 +3,7 @@ using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Tag your music using the latest search result",
-                       arguments: "!<tag>",
-                         options: "view-group-by-artist",
+                         options: "!create|!view-group-by-artist",
                          example: "tag")]
 public class TagCommand : SpotifyBaseCommando
 {
@@ -19,18 +18,18 @@ public class TagCommand : SpotifyBaseCommando
 
     public override RunResult Run()
     {
-        var tag = Input.SingleArgument;
         if (HasOption("view-group-by-artist"))
         {
-            View(tag);
+            View(GetOptionValue("view-group-by-artist"));
             return Ok();
         }
+        var tag = GetOptionValue("create");
         _taggedTracks = StorageService<TaggedTracks>.Service.GetObject();
         foreach (var track in LastSearch)
         {
             var existing = SpotifyDB.Tracks.FirstOrDefault(t => t.Id == track.Id);
-            if (existing != null) existing.Tags = $"{existing.Tags}#{tag}";
-            track.Tags = $"{track.Tags}#{tag}";
+            if (existing != null && !existing.Tags.Contains($"#{tag}")) existing.Tags = $"{existing.Tags}#{tag}";
+            if(!track.Tags.Contains($"#{tag}")) track.Tags = $"{track.Tags}#{tag}";
         }
         Print(LastSearch);
         var saveChanges = DialogService.YesNoDialog("Do you want to save tracks with the added tag?");
