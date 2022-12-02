@@ -21,7 +21,7 @@ public class SearchCommand : SpotifyBaseCommando
     {
         DisableLog();
         
-        LastSearch.Clear();
+        LastSearchedTracks.Clear();
 
         var findings = new List<PowerCommandTrack>();
         var search = Input.SingleQuote.ToLower();
