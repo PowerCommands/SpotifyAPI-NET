@@ -18,7 +18,7 @@ public class TokenCommand : CommandBase<PowerCommandsConfiguration>
             StorageService<Token>.Service.StoreObject(new Token { OathToken = token });
             WriteSuccessLine("Token saved");
         }
-        else ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/get-current-user-playlists/");
+        else ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/post-playlists/");
         return Ok();
     }
 }
