@@ -62,7 +62,7 @@ public class SyncCommand : SpotifyBaseCommando
 
     private void SyncTags()
     {
-        var taggedTracks = StorageService<Tagged>.Service.GetObject();
+        var taggedTracks = StorageService<TaggedTracks>.Service.GetObject();
         foreach (var powerCommandTrack in SpotifyDB.Tracks.Where(powerCommandTrack => taggedTracks.Tracks.Any(t => t.Id == powerCommandTrack.Id))) powerCommandTrack.Tags = taggedTracks.Tracks.First(t => t.Id == powerCommandTrack.Id).Tags;
     }
 }

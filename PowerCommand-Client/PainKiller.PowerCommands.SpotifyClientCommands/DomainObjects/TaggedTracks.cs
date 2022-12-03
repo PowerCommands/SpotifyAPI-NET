@@ -1,6 +1,5 @@
 ﻿namespace PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
-public class Tagged
+public class TaggedTracks
 {
     public List<PowerCommandTrack> Tracks { get; set; } = new();
-    public List<PowerCommandPlaylist> Playlists { get; set; } = new();
 }

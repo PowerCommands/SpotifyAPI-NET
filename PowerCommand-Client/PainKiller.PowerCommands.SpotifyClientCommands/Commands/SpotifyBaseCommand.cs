@@ -36,7 +36,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandPlaylist> playlists)
     {
-        var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Tags = t.Tags, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ });
+        var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ });
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {playlists.Count} playlists");
         Write("You could add a tag to a playlist using the index like this:");
