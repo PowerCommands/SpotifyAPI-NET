@@ -5,7 +5,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Search Spotify catalog or your locally stored play-lists, default search is on artist",
                        arguments: "<search1> <search2>",
-                         options: "title|album|!year|!tag|artist",
+                         options: "title|album|!year|!tag|artist|begins-with",
                          example: "search \"Iron maiden\"")]
 public class SearchCommand : SpotifyBaseCommando
 {
@@ -25,7 +25,7 @@ public class SearchCommand : SpotifyBaseCommando
 
         var findings = new List<PowerCommandTrack>();
         var search = Input.SingleQuote.ToLower();
-        if (string.IsNullOrEmpty(search) && Input.Options.Length == 0) search = string.Join(' ', Input.Arguments);
+        if (string.IsNullOrEmpty(search)) search = string.Join(' ', Input.Arguments);
 
 
         if (!Input.MustHaveOneOfTheseOptionCheck(new[] { "artist", "title", "album" }) && string.IsNullOrEmpty(Input.SingleQuote)) return BadParameterError("A search on artist, title or album could not be empty");
@@ -36,7 +36,7 @@ public class SearchCommand : SpotifyBaseCommando
         else findings.AddRange(SearchArtist(search));
         
         if(HasOption("year")) findings = findings.Where(f => f.ReleaseYear == Input.OptionToInt("year")).ToList();
-
+        if(HasOption("begins-with")) findings = findings.Where(f => f.Artist.ToLower().StartsWith(search) || f.Name.ToLower().StartsWith(search) || f.AlbumName.ToLower().StartsWith(search)).ToList();
         Print(findings);
 
         EnableLog();
