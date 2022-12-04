@@ -24,12 +24,12 @@ public class PlayingCommand : SpotifyBaseCommando
     private async Task ShowQueue()
     {
         var queue = await Client!.Player.GetQueue();
-        WriteLine($"Count: {queue.Queue.Count}");
+        WriteHeadLine("\nNext in queue:");
         for (var index = 0; index < queue.Queue.Count; index++)
         {
             var playableItem = queue.Queue[index];
-            var fullTrack = playableItem as SimpleTrack;
-            if (fullTrack != null) WriteSuccessLine($"{index+1} {fullTrack.Artists.FirstOrDefault()?.Name} {fullTrack.Name}");
+            var fullTrack = playableItem as FullTrack;
+            if (fullTrack != null) WriteLine($"{index+1} {fullTrack.Artists.FirstOrDefault()?.Name} {fullTrack.Name} {fullTrack.Album.ReleaseDate}");
         }
     }
 

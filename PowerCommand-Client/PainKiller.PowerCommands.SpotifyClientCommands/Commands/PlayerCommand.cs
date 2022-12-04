@@ -1,4 +1,5 @@
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
@@ -41,6 +42,7 @@ public class PlayerCommand : SpotifyBaseCommando
                 if (HasOption("queue")) await AddToQueue();
                 break;
         }
+        Thread.Sleep(1500);
         await ShowCurrentlyPlayingTrack();
         Write(ConfigurationGlobals.Prompt);
         return Ok();
