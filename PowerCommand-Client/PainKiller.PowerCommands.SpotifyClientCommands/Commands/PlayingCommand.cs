@@ -21,7 +21,7 @@ public class PlayingCommand : SpotifyBaseCommando
         return Ok();
     }
 
-    private async Task ShowQueue()
+    protected async Task ShowQueue()
     {
         var queue = await Client!.Player.GetQueue();
         WriteHeadLine("\nNext in queue:");
@@ -33,7 +33,7 @@ public class PlayingCommand : SpotifyBaseCommando
         }
     }
 
-    private async Task ShowCurrentlyPlayingTrack()
+    protected async Task ShowCurrentlyPlayingTrack()
     {
         try
         {
