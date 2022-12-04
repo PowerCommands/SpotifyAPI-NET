@@ -41,14 +41,18 @@ public class SearchCommand : SpotifyBaseCommando
             case SearchRequest.Types.Album:
                 EnumerateAlbums(searchResponse.Albums);
                 break;
+            case SearchRequest.Types.Track:
+                EnumerateTracks(searchResponse.Tracks);
+                if (HasOption("artist")) LastSearchedTracks = LastSearchedTracks.Where(t => t.Artist.ToLower().Contains(GetOptionValue("artist").ToLower())).ToList();
+                Print(LastSearchedTracks);
+                break;
             case SearchRequest.Types.Artist:
                 EnumerateArtists(searchResponse.Artists);
                 break;
-            case SearchRequest.Types.Track:
-                EnumerateTracks(searchResponse.Tracks);
-                break;
             default:
-                throw new ArgumentOutOfRangeException();
+                EnumerateTracks(searchResponse.Tracks);
+                Print(LastSearchedTracks);
+                break;
         }
         Write(ConfigurationGlobals.Prompt);
         EnableLog();
@@ -57,10 +61,10 @@ public class SearchCommand : SpotifyBaseCommando
     private void EnumerateTracks(Paging<FullTrack, SearchResponse> page)
     {
         if(page.Items == null) return;
+        LastSearchedTracks.Clear();
         foreach (var item in page.Items)
         {
             if (item is not { } track) continue;
-            Console.WriteLine($"{track.Artists.First().Name} {track.Name} {item.Popularity}");
             var pcTrack = new PowerCommandTrack(track, "");
             LastSearchedTracks.Add(pcTrack);
         }
