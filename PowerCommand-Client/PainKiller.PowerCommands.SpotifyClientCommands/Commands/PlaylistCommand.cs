@@ -38,7 +38,23 @@ public class PlaylistCommand : SpotifyBaseCommando
         try
         {
             var playlist = await Client.Playlists.Create($"{user.Id}", new PlaylistCreateRequest(name) { Description = "Demo playlist", Collaborative = false, Public = false });
-            var response = await Client.Playlists.AddItems($"{playlist.Id}", new PlaylistAddItemsRequest(tracks.Select(l => l.Uri).ToList()));
+            var chunkSize = 100;
+            var chunkOfTracks = tracks.Take(chunkSize).ToList();
+            var chunkCount = 0;
+            while (chunkOfTracks.Count > 0 &&  chunkCount < 10)
+            {
+                var response = await Client.Playlists.AddItems($"{playlist.Id}", new PlaylistAddItemsRequest(chunkOfTracks.Select(l => l.Uri).ToList()));
+                WriteLine($"SnapshotId: {response.SnapshotId}");
+                foreach (var chunkTrack in chunkOfTracks)
+                {
+                    var existing = tracks.First(t => t.Id == chunkTrack.Id);
+                    tracks.Remove(existing);
+                }
+                chunkOfTracks.Clear();
+                chunkOfTracks.AddRange(tracks.Take(chunkSize));
+                chunkCount++;
+            }
+            
         }
         catch (Exception ex)
         {

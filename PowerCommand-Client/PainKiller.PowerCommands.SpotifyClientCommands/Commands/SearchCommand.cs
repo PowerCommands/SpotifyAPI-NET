@@ -5,7 +5,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Search Spotify catalog or your locally stored play-lists, default search is on artist",
                        arguments: "<search1> <search2>",
-                         options: "title|album|!year|!tag|artist|begins-with",
+                         options: "artist|title|album|playlist|!year|tag|begins-with",
                          example: "search \"Iron maiden\"")]
 public class SearchCommand : SpotifyBaseCommando
 {
@@ -33,9 +33,19 @@ public class SearchCommand : SpotifyBaseCommando
 
         if(HasOption("title")) findings.AddRange(SearchTitle(search));
         else if(HasOption("album")) findings.AddRange(SearchAlbum(search));
-        else if(HasOption("tag")) findings.AddRange(SearchTag(GetOptionValue("tag")));
-        else findings.AddRange(SearchArtist(search));
-        
+        else if(HasOption("tag")) findings.AddRange(SearchTag(search));
+        else if(HasOption("playlist")) findings.AddRange(SearchPlaylist(search));
+        else if(HasOption("artist")) findings.AddRange(SearchArtist(search));
+        else
+        {
+            var searchAll = new List<PowerCommandTrack>();
+            searchAll.AddRange(SearchTitle(search));
+            searchAll.AddRange(SearchAlbum(search));
+            searchAll.AddRange(SearchTag(search));
+            searchAll.AddRange(SearchPlaylist(search));
+            searchAll.AddRange(SearchArtist(search));
+            foreach (var track in searchAll.Where(track => findings.All(f => f.Id != track.Id))) findings.Add(track);
+        }
         if(HasOption("year")) findings = findings.Where(f => f.ReleaseYear == Input.OptionToInt("year")).ToList();
         if(HasOption("begins-with")) findings = findings.Where(f => f.Artist.ToLower().StartsWith(search) || f.Name.ToLower().StartsWith(search) || f.AlbumName.ToLower().StartsWith(search)).ToList();
         Print(findings);
@@ -47,4 +57,5 @@ public class SearchCommand : SpotifyBaseCommando
     private List<PowerCommandTrack> SearchArtist(string search) => SpotifyDB.Tracks.Where(t => t.Artist.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchTitle(string search) => SpotifyDB.Tracks.Where(t => t.Name.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchAlbum(string search) => SpotifyDB.Tracks.Where(t => t.AlbumName.ToLower().Contains(search)).ToList();
+    private List<PowerCommandTrack> SearchPlaylist(string search) => SpotifyDB.Tracks.Where(t => t.PlaylistName.ToLower().Contains(search)).ToList();
 }
