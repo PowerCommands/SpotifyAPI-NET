@@ -39,9 +39,9 @@ public class PlayerCommand : SpotifyBaseCommando
                 break;
             default:
                 if (HasOption("queue")) await AddToQueue();
-                else await ShowCurrentlyPlayingTrack();
                 break;
         }
+        await ShowCurrentlyPlayingTrack();
         Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
