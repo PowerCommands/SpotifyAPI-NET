@@ -5,6 +5,7 @@ using System.Diagnostics;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfiguration>
 {
+    protected string SearchPhrase = "";
     protected bool NoClient;
     protected static SpotifyDB SpotifyDB = new();
     protected SpotifyClient? Client;
@@ -29,7 +30,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         LastSearchedTracks.AddRange(tracks);
         var table = tracks.Select(t => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags });
         ConsoleTableService.RenderTable(table, this);
-        WriteHeadLine($"Found {tracks.Count} tracks");
+        WriteHeadLine($"Found {tracks.Count} tracks with search phrase {SearchPhrase}");
         Write("You could create a playlist using this search result with the following command:");
         WriteCodeExample("playlist","--create <name> --from-search");
     }

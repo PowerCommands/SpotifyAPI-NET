@@ -27,6 +27,7 @@ public class SearchCommand : SpotifyBaseCommando
         var search = Input.SingleQuote.ToLower();
         if (string.IsNullOrEmpty(search)) search = string.Join(' ', Input.Arguments);
 
+        SearchPhrase = search;
 
         if (!Input.MustHaveOneOfTheseOptionCheck(new[] { "artist", "title", "album" }) && string.IsNullOrEmpty(Input.SingleQuote)) return BadParameterError("A search on artist, title or album could not be empty");
 
