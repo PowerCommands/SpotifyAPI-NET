@@ -2,6 +2,7 @@
 
 public class TrackSearchTableItem
 {
+    public int Index { get; set; }
     public string Artist { get; set; } = "";
     public string Name { get; set; } = default!;
     public string ReleaseDate { get; set; } = "";
