@@ -5,6 +5,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfiguration>
 {
     protected string SearchPhrase = "";
+    protected static LastSearchType LastSearchType = LastSearchType.None;
     protected bool NoClient;
     protected static SpotifyDB SpotifyDB = new();
     protected SpotifyClient? Client;
@@ -25,6 +26,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandTrack> tracks)
     {
+        LastSearchType = LastSearchType.Track;
         LastSearchedTracks.AddRange(tracks);
         var table = tracks.Select((t, index) => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags, Index = index++ });
         ConsoleTableService.RenderTable(table, this);
@@ -35,6 +37,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandArtist> artists)
     {
+        LastSearchType = LastSearchType.Artist;
         LastSearchedArtists.AddRange(artists);
         var table = artists.Select((a, index) => new ArtistTableItem(a){Index = index++}).ToList();
         ConsoleTableService.RenderTable(table, this);
@@ -46,6 +49,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandPlaylist> playlists)
     {
+        LastSearchType = LastSearchType.Playlist;
         var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ });
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {playlists.Count} playlists");

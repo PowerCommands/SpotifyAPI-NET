@@ -8,6 +8,7 @@ public class PowerCommandTrack
     public PowerCommandTrack(FullTrack track, string playlistName)
     {
         Artist = track.Artists.FirstOrDefault() == null ? "?" : track.Artists.First().Name;
+        ArtistId = track.Artists.FirstOrDefault() == null ? "?" : track.Artists.First().Id;
         Id = track.Id;
         DurationMs = track.DurationMs;
         IsLocal = track.IsLocal;
@@ -21,6 +22,7 @@ public class PowerCommandTrack
         PlaylistName = playlistName;
     }
     public string Artist { get; set; } = "";
+    public string ArtistId { get; set; } = "";
     public int DurationMs { get; set; }
     public string Id { get; set; } = "";
     public bool IsPlayable { get; set; }

@@ -1,5 +1,4 @@
-using System.ComponentModel.Design;
-using System.Diagnostics;
+using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
@@ -7,7 +6,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Control the Spotify player",
                         useAsync: true,
-                        options: "queue",
+                        options: "queue|history",
                          example: "player next")]
 public class PlayerCommand : SpotifyBaseCommando
 {
@@ -40,6 +39,7 @@ public class PlayerCommand : SpotifyBaseCommando
                 break;
             default:
                 if (HasOption("queue")) await AddToQueue();
+                if (HasOption("history")) await ShowRecentPlayedTrack();
                 break;
         }
         Thread.Sleep(1500);
@@ -63,6 +63,22 @@ public class PlayerCommand : SpotifyBaseCommando
             var response = await (Client?.Player.GetCurrentlyPlaying(new PlayerCurrentlyPlayingRequest(PlayerCurrentlyPlayingRequest.AdditionalTypes.Track))!).ConfigureAwait(false);
             var fullTrack = response.Item as FullTrack;
             if (fullTrack != null) WriteSuccessLine($"Playing {fullTrack.Artists.FirstOrDefault()?.Name} {fullTrack.Name} {fullTrack.Album.ReleaseDate}");
+        }
+        catch (Exception ex)
+        {
+            WriteLine(ex.Message);
+        }
+    }
+    private async Task ShowRecentPlayedTrack()
+    {
+        try
+        {
+            LastSearchedTracks.Clear();
+            var response = await Client?.Player.GetRecentlyPlayed()!;
+            if (response.Items != null)
+                foreach (var item in response.Items)
+                    LastSearchedTracks.Add(new PowerCommandTrack(item.Track, "recently played"));
+            Print(LastSearchedTracks);
         }
         catch (Exception ex)
         {

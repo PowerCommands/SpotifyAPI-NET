@@ -20,7 +20,6 @@ public class PlayingCommand : SpotifyBaseCommando
         Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
-
     protected async Task ShowQueue()
     {
         var queue = await Client!.Player.GetQueue();
@@ -32,7 +31,6 @@ public class PlayingCommand : SpotifyBaseCommando
             if (fullTrack != null) WriteLine($"{index+1} {fullTrack.Artists.FirstOrDefault()?.Name} {fullTrack.Name} {fullTrack.Album.ReleaseDate}");
         }
     }
-
     protected async Task ShowCurrentlyPlayingTrack()
     {
         try

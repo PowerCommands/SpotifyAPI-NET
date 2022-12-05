@@ -31,8 +31,8 @@ public class SearchCommand : SpotifyBaseCommando
         else if(HasOption("artist")) searchType = SearchRequest.Types.Artist;
         pageCounter = 0;
         if (HasOption("page-count")) maxPageCount = Input.OptionToInt("page-count");
-
         if(HasOption("genre")) search = $"{search} genre:{GetOptionValue("genre")}";
+        if(HasOption("track") && HasOption("artist")) search = $"{search} artist:{GetOptionValue("artist")}";
 
         var searchResponse = await Client!.Search.Item(new SearchRequest(searchType, search));
         

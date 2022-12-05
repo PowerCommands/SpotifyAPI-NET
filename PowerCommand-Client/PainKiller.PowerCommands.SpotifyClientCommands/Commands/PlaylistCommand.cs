@@ -4,7 +4,7 @@ using SpotifyAPI.Web;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Create playlist, view playlist",
-                         options: "!create|from-search|view",
+                         options: "!add|!create",
                         useAsync: true,
                          example: "playlist --create <name> --from-search")]
 public class PlaylistCommand : SpotifyBaseCommando
@@ -13,23 +13,21 @@ public class PlaylistCommand : SpotifyBaseCommando
 
     public override async Task<RunResult> RunAsync()
     {
-        if (HasOption("view"))
+        if (HasOption("create"))
         {
-            Print(SpotifyDB.Playlists);
+            var tracks = new List<PowerCommandTrack>();
+            foreach (var powerCommandTrack in LastSearchedTracks.Where(powerCommandTrack => !tracks.Any(t => t.Name == powerCommandTrack.Name && t.Artist == powerCommandTrack.Artist && t.ReleaseYear == powerCommandTrack.ReleaseYear))) tracks.Add(powerCommandTrack);
+            var name = string.IsNullOrEmpty(GetOptionValue("create")) ? "Created by Power commands" : GetOptionValue("create");
+            await CreatePlaylist(name, tracks);
+            Write(ConfigurationGlobals.Prompt);
             return Ok();
         }
-        if (Client == null)
+        if (HasOption("add"))
         {
-            WriteFailure("No client could be loaded, you probably missing a valid token, you need a token with playlist-read-private and playlist-modify-private permissions.");
-            var loadSpotifyConsole = DialogService.YesNoDialog("Open the Spotify API console where you could get a new token?");
-            if(loadSpotifyConsole) ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/get-current-user-playlists/");
-            return ExceptionError("Spotify API Client is null");
+            await AddToPlaylist(GetOptionValue("add"));
+            return Ok();
         }
-        var tracks = new List<PowerCommandTrack>();
-        foreach (var powerCommandTrack in LastSearchedTracks.Where(powerCommandTrack => !tracks.Any(t => t.Name == powerCommandTrack.Name && t.Artist == powerCommandTrack.Artist && t.ReleaseYear == powerCommandTrack.ReleaseYear))) tracks.Add(powerCommandTrack);
-        var name = string.IsNullOrEmpty(GetOptionValue("create")) ? "Created by Power commands" : GetOptionValue("create");
-        await CreatePlaylist(name, tracks);
-        Write(ConfigurationGlobals.Prompt);
+        Print(SpotifyDB.Playlists);
         return Ok();
     }
     public async Task CreatePlaylist(string name, List<PowerCommandTrack> tracks)
@@ -61,5 +59,26 @@ public class PlaylistCommand : SpotifyBaseCommando
             WriteError(ex.Message);
             WriteLine($"{Client.LastResponse!.StatusCode}");
         }
+    }
+    public async Task AddToPlaylist(string playlistName)
+    {
+        var playlist = SpotifyDB.Playlists.FirstOrDefault(p => p.Name.Contains(playlistName));
+        if (playlist == null)
+        {
+            WriteLine($"Could not find a playlist matching \"{playlistName}\"");
+            return;
+        }
+        if (LastSearchedTracks.Count > 0)
+        {
+            WriteLine($"You must first search for tracks");
+            return;
+        }
+        var track = LastSearchedTracks[Input.OptionToInt("add")];
+        try
+        {
+            var response = await Client!.Playlists.AddItems($"{playlist.Id}", new PlaylistAddItemsRequest( new List<string> {track.Uri}));
+            WriteLine($"SnapshotId: {response.SnapshotId}");
+        }
+        catch (Exception ex) { WriteError(ex.Message); }
     }
 }

@@ -14,11 +14,15 @@ public class TokenCommand : CommandBase<PowerCommandsConfiguration>
     {
         if (HasOption("save"))
         {
-            var token = DialogService.QuestionAnswerDialog("Paste your [playlist-read-private] [playlist-modify-private] [user-read-currently-playing] [user-modify-playback-state] [user-read-playback-state] permission token");
+            var token = DialogService.QuestionAnswerDialog("Paste your permission token");
             StorageService<Token>.Service.StoreObject(new Token { OathToken = token });
             WriteSuccessLine("Token saved");
         }
-        else ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/post-playlists/");
+        else
+        {
+            DialogService.QuestionAnswerDialog("You will need this permissions: [playlist-read-private] [playlist-modify-private] [user-read-currently-playing] [user-modify-playback-state] [user-read-playback-state] [user-read-recently-played], hit enter to open the Spotify API page and create a token");
+            ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/post-playlists/");
+        }
         return Ok();
     }
 }
