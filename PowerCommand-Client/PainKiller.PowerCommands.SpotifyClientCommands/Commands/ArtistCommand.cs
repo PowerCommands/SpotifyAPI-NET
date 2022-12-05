@@ -44,7 +44,6 @@ public class ArtistCommand : SpotifyBaseCommando
             WriteError($"Could not figure out the artist id using the index {artistIndex} and last artist search or last track search.");
             return;
         }
-
         SearchPhrase = $"{artist.Name} top tracks";
         var searchResponse = await Client!.Artists.GetTopTracks(artist.Id, new ArtistsTopTracksRequest("sv"));
         var tracks = searchResponse.Tracks.Select(a => new PowerCommandTrack(a, "search")).ToList();

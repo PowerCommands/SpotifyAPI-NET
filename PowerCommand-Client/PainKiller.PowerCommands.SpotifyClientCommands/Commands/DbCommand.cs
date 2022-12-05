@@ -5,11 +5,11 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandTest(         tests: "iron maiden")]
 [PowerCommandDesign( description: "Search your locally stored play-lists, default search is on artist, album, title, playlist and tag (in short search all)",
                        arguments: "<search1> <search2> <search2> and so on...",
-                         options: "artist|title|album|playlist|!year|tag|begins-with",
+                         options: "artist|track|album|playlist|!year|tag|begins-with",
                          example: "//Search all|database \"Iron maiden\"|//search playlist|database party --playlist")]
-public class DatabaseCommand : SpotifyBaseCommando
+public class DbCommand : SpotifyBaseCommando
 {
-    public DatabaseCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
+    public DbCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
     {
@@ -53,7 +53,6 @@ public class DatabaseCommand : SpotifyBaseCommando
         EnableLog();
         return Ok();
     }
-
     private List<PowerCommandTrack> SearchArtist(string search) => SpotifyDB.Tracks.Where(t => t.Artist.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchTitle(string search) => SpotifyDB.Tracks.Where(t => t.Name.ToLower().Contains(search)).ToList();
     private List<PowerCommandTrack> SearchAlbum(string search) => SpotifyDB.Tracks.Where(t => t.AlbumName.ToLower().Contains(search)).ToList();

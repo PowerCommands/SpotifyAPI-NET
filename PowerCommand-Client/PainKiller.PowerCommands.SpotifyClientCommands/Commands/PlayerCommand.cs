@@ -78,6 +78,7 @@ public class PlayerCommand : SpotifyBaseCommando
             if (response.Items != null)
                 foreach (var item in response.Items)
                     LastSearchedTracks.Add(new PowerCommandTrack(item.Track, "recently played"));
+            SearchPhrase = "Tracks played recently";
             Print(LastSearchedTracks);
         }
         catch (Exception ex)

@@ -26,9 +26,10 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandTrack> tracks)
     {
+        var take = Input.OptionToInt("take");
         LastSearchType = LastSearchType.Track;
         LastSearchedTracks.AddRange(tracks);
-        var table = tracks.Select((t, index) => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags, Index = index++ });
+        var table = tracks.Select((t, index) => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags, Index = index++ }).Take(take == 0 ? 1000 : take);
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {tracks.Count} tracks with search phrase {SearchPhrase}");
         Write("You could create a playlist using this search result with the following command:");
@@ -37,9 +38,10 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandArtist> artists)
     {
+        var take = Input.OptionToInt("take", 1000);
         LastSearchType = LastSearchType.Artist;
         LastSearchedArtists.AddRange(artists);
-        var table = artists.Select((a, index) => new ArtistTableItem(a){Index = index++}).ToList();
+        var table = artists.Select((a, index) => new ArtistTableItem(a){Index = index++}).Take(take == 0 ? 1000 : take).ToList();
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {table.Count} artist with search phrase {SearchPhrase}");
         Write("You could use an artist from this search to find tracks, albums or related artists:");
@@ -49,8 +51,9 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
 
     protected void Print(List<PowerCommandPlaylist> playlists)
     {
+        var take = Input.OptionToInt("take", 1000);
         LastSearchType = LastSearchType.Playlist;
-        var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ });
+        var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ }).Take(take == 0 ? 1000 : take);
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {playlists.Count} playlists");
         Write("You could add a tag to a playlist using the index like this:");
