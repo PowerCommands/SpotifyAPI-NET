@@ -16,11 +16,9 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
     {
         SpotifyDB = StorageService<SpotifyDB?>.Service.GetObject() ?? new SpotifyDB();
-        if (!NoClient)
-        {
-            var token = StorageService<Token>.Service.GetObject().OathToken;
-            Client = new SpotifyClient($"{token}");
-        }
+        if (NoClient) return base.InitializeAndValidateInput(input, designAttribute);
+        var token = StorageService<Token>.Service.GetObject().OathToken;
+        Client = new SpotifyClient($"{token}");
         return base.InitializeAndValidateInput(input, designAttribute);
     }
 
@@ -55,7 +53,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         LastSearchType = LastSearchType.Playlist;
         var table = playlists.Select((t, index) => new PlaylistSearchTableItem { Name = t.Name, Id = t.Id, TrackCount = t.Tracks.Count, Index = index++ }).Take(take == 0 ? 1000 : take);
         ConsoleTableService.RenderTable(table, this);
-        WriteHeadLine($"Found {playlists.Count} playlists");
+        WriteHeadLine($"Found {playlists.Count} play-lists");
         Write("You could add a tag to a playlist using the index like this:");
         WriteCodeExample("tag","--create --playlist 0");
         Write(ConfigurationGlobals.Prompt);

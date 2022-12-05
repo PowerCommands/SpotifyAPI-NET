@@ -47,19 +47,25 @@ public class SyncCommand : SpotifyBaseCommando
     }
     private async Task EnumeratePlaylistTracksAsync(Paging<PlaylistTrack<IPlayableItem>> page, PowerCommandPlaylist pcPlaylist)
     {
-        await foreach (var item in Client!.Paginate(page))
-            if (item.Track is FullTrack track)
-            {
-                Console.WriteLine($"{track.Artists.First().Name} {track.Name}");
-                var pcTrack = new PowerCommandTrack(track, pcPlaylist.Name);
-                pcPlaylist.Tracks.Add(pcTrack);
-                if (SpotifyDB.Tracks.All(t => t.Id != track.Id))
+        try
+        {
+            await foreach (var item in Client!.Paginate(page))
+                if (item.Track is FullTrack track)
                 {
-                    SpotifyDB.Tracks.Add(pcTrack);
+                    Console.WriteLine($"{track.Artists.First().Name} {track.Name}");
+                    var pcTrack = new PowerCommandTrack(track, pcPlaylist.Name);
+                    pcPlaylist.Tracks.Add(pcTrack);
+                    if (SpotifyDB.Tracks.All(t => t.Id != track.Id)) SpotifyDB.Tracks.Add(pcTrack);
+                    var simpleArtist = track.Artists.FirstOrDefault();
+                    if (simpleArtist != null && SpotifyDB.Artists.All(a => a.Id != simpleArtist.Id) && !string.IsNullOrEmpty(simpleArtist.Id))
+                    {
+                        var artist = await Client.Artists.Get(simpleArtist.Id);
+                        SpotifyDB.Artists.Add(new PowerCommandArtist(artist));
+                    }
                 }
-            }
+        }
+        catch (Exception ex)  { WriteError(ex.Message); }
     }
-
     private void SyncTags()
     {
         var taggedTracks = StorageService<TaggedTracks>.Service.GetObject();

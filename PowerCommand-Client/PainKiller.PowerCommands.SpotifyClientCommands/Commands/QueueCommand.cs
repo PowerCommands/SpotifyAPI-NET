@@ -15,7 +15,7 @@ public class QueueCommand : PlayingCommand
     {
         if (HasOption("add")) await AddToQueue();
         else await ShowQueue();
-        Thread.Sleep(1500);
+        Thread.Sleep(500);
         await ShowCurrentlyPlayingTrack();
         Write(ConfigurationGlobals.Prompt);
         return Ok();

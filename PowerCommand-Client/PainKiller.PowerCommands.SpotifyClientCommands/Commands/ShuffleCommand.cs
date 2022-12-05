@@ -1,4 +1,3 @@
-using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
@@ -10,7 +9,6 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public class ShuffleCommand : SpotifyBaseCommando
 {
     public ShuffleCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
-
     public override async Task<RunResult> RunAsync()
     {
         var shuffleOn = Input.SingleArgument.ToLower() == "on";

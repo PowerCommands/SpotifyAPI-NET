@@ -42,7 +42,7 @@ public class PlayerCommand : SpotifyBaseCommando
                 if (HasOption("history")) await ShowRecentPlayedTrack();
                 break;
         }
-        Thread.Sleep(1500);
+        Thread.Sleep(500);
         await ShowCurrentlyPlayingTrack();
         Write(ConfigurationGlobals.Prompt);
         return Ok();
