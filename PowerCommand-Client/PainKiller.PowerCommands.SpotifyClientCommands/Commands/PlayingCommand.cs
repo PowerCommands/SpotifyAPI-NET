@@ -1,10 +1,6 @@
-using System.ComponentModel.Design;
 using SpotifyAPI.Web;
-using SpotifyAPI.Web.Http;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Control the Spotify player",
                         useAsync: true,
                         options: "queue",

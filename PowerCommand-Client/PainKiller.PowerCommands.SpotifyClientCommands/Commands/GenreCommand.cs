@@ -2,7 +2,6 @@ using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "View spotify genres (or category as they calling it in their API model",
                          options: "overwrite",
                         useAsync: true,

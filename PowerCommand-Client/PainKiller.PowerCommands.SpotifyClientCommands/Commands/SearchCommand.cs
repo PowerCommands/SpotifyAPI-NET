@@ -3,7 +3,6 @@ using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: "abba")]
 [PowerCommandDesign( description: "Search the Spotify catalog",
                        arguments: "<search1> <search2> <search2> and so on...",
                          options: "artist|track|album|!year|!genre|begins-with|!page-count",
@@ -13,11 +12,14 @@ public class SearchCommand : SpotifyBaseCommando
 {
     int pageCounter = 0;
     private int maxPageCount = 3;
+    private List<PowerCommandTrack> _tracks = new();
     public SearchCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override async Task<RunResult> RunAsync()
     {
         DisableLog();
+        _tracks.Clear();
+        LastSearchedTracks.Clear();
 
         var search = Input.SingleQuote.ToLower();
         if (string.IsNullOrEmpty(search)) search = string.Join(' ', Input.Arguments);
@@ -44,14 +46,14 @@ public class SearchCommand : SpotifyBaseCommando
             case SearchRequest.Types.Track:
                 EnumerateTracks(searchResponse.Tracks);
                 if (HasOption("artist")) LastSearchedTracks = LastSearchedTracks.Where(t => t.Artist.ToLower().Contains(GetOptionValue("artist").ToLower())).ToList();
-                Print(LastSearchedTracks);
+                Print(_tracks);
                 break;
             case SearchRequest.Types.Artist:
                 EnumerateArtists(searchResponse.Artists);
                 break;
             default:
                 EnumerateTracks(searchResponse.Tracks);
-                Print(LastSearchedTracks);
+                Print(_tracks);
                 break;
         }
         Write(ConfigurationGlobals.Prompt);
@@ -61,12 +63,11 @@ public class SearchCommand : SpotifyBaseCommando
     private void EnumerateTracks(Paging<FullTrack, SearchResponse> page)
     {
         if(page.Items == null) return;
-        LastSearchedTracks.Clear();
         foreach (var item in page.Items)
         {
             if (item is not { } track) continue;
             var pcTrack = new PowerCommandTrack(track, "");
-            LastSearchedTracks.Add(pcTrack);
+            _tracks.Add(pcTrack);
         }
         if(page.Items.Count < 20) return;
         var nextPage = Client?.NextPage(page);

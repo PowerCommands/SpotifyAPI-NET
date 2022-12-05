@@ -1,8 +1,6 @@
 using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Open Spotify Console, you can also save a token, but it is only valid temporary.",
                          options:"save",
                          example: "token")]

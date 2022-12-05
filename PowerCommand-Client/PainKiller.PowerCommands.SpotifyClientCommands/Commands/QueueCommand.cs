@@ -13,14 +13,14 @@ public class QueueCommand : PlayingCommand
 
     public override async Task<RunResult> RunAsync()
     {
-        if (HasOption("add")) await AddToQueue();
+        if (HasOption("add")) await AddTracksToQueue();
         else await ShowQueue();
         Thread.Sleep(500);
         await ShowCurrentlyPlayingTrack();
         Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
-    private async Task AddToQueue()
+    protected async Task AddTracksToQueue()
     {
         var index =  int.TryParse(Input.SingleArgument, out var idx) ? idx : -1;
         var tracks = new List<PowerCommandTrack>();

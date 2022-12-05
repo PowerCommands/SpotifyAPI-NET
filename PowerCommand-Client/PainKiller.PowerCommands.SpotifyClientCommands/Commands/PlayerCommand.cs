@@ -3,7 +3,6 @@ using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Control the Spotify player",
                         useAsync: true,
                         options: "queue|history",
@@ -75,11 +74,12 @@ public class PlayerCommand : SpotifyBaseCommando
         {
             LastSearchedTracks.Clear();
             var response = await Client?.Player.GetRecentlyPlayed()!;
+            var tracks = new List<PowerCommandTrack>();
             if (response.Items != null)
                 foreach (var item in response.Items)
-                    LastSearchedTracks.Add(new PowerCommandTrack(item.Track, "recently played"));
+                    tracks.Add(new PowerCommandTrack(item.Track, "recently played"));
             SearchPhrase = "Tracks played recently";
-            Print(LastSearchedTracks);
+            Print(tracks);
         }
         catch (Exception ex)
         {

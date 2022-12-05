@@ -1,5 +1,4 @@
 using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Tag your music using the latest search result",

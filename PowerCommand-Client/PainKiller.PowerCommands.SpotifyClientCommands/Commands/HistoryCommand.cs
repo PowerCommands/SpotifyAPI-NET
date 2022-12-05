@@ -1,8 +1,5 @@
-using SpotifyAPI.Web;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Show recent played tracks",
                         useAsync: true,
                         example: "history")]

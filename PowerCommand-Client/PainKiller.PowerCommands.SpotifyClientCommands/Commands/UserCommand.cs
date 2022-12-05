@@ -1,8 +1,6 @@
 using SpotifyAPI.Web;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandTest(         tests: " ")]
 [PowerCommandDesign( description: "Get current user if your token is valid",
                         useAsync: true,
                          example: "user")]
