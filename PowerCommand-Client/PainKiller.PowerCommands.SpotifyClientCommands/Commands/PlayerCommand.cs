@@ -69,7 +69,7 @@ public class PlayerCommand : SpotifyBaseCommando
             WriteLine(ex.Message);
         }
     }
-    private async Task ShowRecentPlayedTrack()
+    protected async Task ShowRecentPlayedTrack()
     {
         try
         {
