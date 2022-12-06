@@ -5,7 +5,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Random a search that could be used to create a playlist or just added to the queue",
                         useAsync: true,
-                         options: "genre|artist|album|track|start-year|end-year|!count|queue",
+                         options: "genre|artist|album|track|year|!count|queue",
                          example: "Random 100 tracks from your play-lists|random_search|//Random 50 tracks|random --count 50|//Random 100 track and add them to queue|random --queue")]
 // ReSharper disable once InconsistentNaming
 public class Rnd_SearchCommand : TracksCommand
@@ -32,6 +32,7 @@ public class Rnd_SearchCommand : TracksCommand
             WriteError(ex.Message);
         }
         EnableLog();
+        Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
 }

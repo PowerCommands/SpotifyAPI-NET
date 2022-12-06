@@ -29,6 +29,7 @@ public class Rnd_SimpleCommand : QueueCommand
         {
             WriteError(ex.Message);
         }
+        Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
 }

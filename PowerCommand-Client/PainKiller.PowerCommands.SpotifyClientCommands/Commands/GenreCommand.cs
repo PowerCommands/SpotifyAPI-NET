@@ -15,6 +15,7 @@ public class GenreCommand : SpotifyBaseCommando
         if (SpotifyDB.Playlists.Count == 0) SpotifyDB = StorageService<SpotifyDB>.Service.GetObject();
         if (SpotifyDB.Genres.Count > 0 && !HasOption("overwrite"))
         {
+            DisableLog();
             NoClient = true;
             return false;
         }
@@ -34,6 +35,7 @@ public class GenreCommand : SpotifyBaseCommando
         }
         foreach (var genre in SpotifyDB.Genres) WriteLine(genre);
         Write(ConfigurationGlobals.Prompt);
+        EnableLog();
         return Ok();
     }
 }
