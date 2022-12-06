@@ -6,7 +6,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandDesign( description: "Create playlist, view playlist",
                          options: "!add|!create",
                         useAsync: true,
-                         example: "playlist --create <name> --from-search")]
+                         example: "playlist --create <name>")]
 public class PlaylistCommand : SpotifyBaseCommando
 {
     public PlaylistCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }

@@ -1,10 +1,11 @@
-using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
+using PainKiller.PowerCommands.SpotifyClientCommands.Contracts;
+using PainKiller.PowerCommands.SpotifyClientCommands.PlaylistAlgorithms;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Random a track list, default random count is 100 tracks",
                         useAsync: true,
-                         options: "!count|queue",
+                         options: "all-local|all-related|!count|queue",
                          example: "Random 100 tracks from your play-lists|random|//Random 50 tracks|random --count 50|//Random 100 track and add them to queue|random --queue")]
 public class RandomCommand : QueueCommand
 {
@@ -14,17 +15,19 @@ public class RandomCommand : QueueCommand
     {
         var take = Input.OptionToInt("count");
         take = take == 0 ? 100 : take;
+        var queue = HasOption("queue");
         LastSearchedTracks.Clear();
-        var rand = new Random();
-        var tracks = new List<PowerCommandTrack>();
-        for (int i = 0; i < take; i++)
+        IPlaylistAlgorithm algorithm;
+        if(HasOption("all-local")) algorithm= new AllLocal(this, take, queue);
+        else algorithm = new AllRelated(this, take, queue);
+        try
         {
-            var trackIndex = rand.Next(0, SpotifyDB.Tracks.Count -1);
-            var track = SpotifyDB.Tracks[trackIndex];
-            tracks.Add(track);
+            await algorithm.RunAsync();
         }
-        Print(tracks);
-        if (HasOption("queue")) await AddTracksToQueue();
+        catch (Exception ex)
+        {
+            WriteError(ex.Message);
+        }
         return Ok();
     }
 }

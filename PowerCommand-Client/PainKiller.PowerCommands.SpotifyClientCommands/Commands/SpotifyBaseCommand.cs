@@ -4,13 +4,13 @@ using SpotifyAPI.Web;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfiguration>
 {
-    protected string SearchPhrase = "";
-    protected static LastSearchType LastSearchType = LastSearchType.None;
-    protected bool NoClient;
-    protected static SpotifyDB SpotifyDB = new();
-    protected SpotifyClient? Client;
-    protected static List<PowerCommandTrack> LastSearchedTracks = new();
-    protected static List<PowerCommandArtist> LastSearchedArtists = new();
+    public string SearchPhrase = "";
+    public static LastSearchType LastSearchType = LastSearchType.None;
+    public bool NoClient;
+    public static SpotifyDB SpotifyDB = new();
+    public SpotifyClient? Client;
+    public static List<PowerCommandTrack> LastSearchedTracks = new();
+    public static List<PowerCommandArtist> LastSearchedArtists = new();
     protected SpotifyBaseCommando(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
@@ -22,7 +22,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         return base.InitializeAndValidateInput(input, designAttribute);
     }
 
-    protected void Print(List<PowerCommandTrack> tracks)
+    public void Print(List<PowerCommandTrack> tracks)
     {
         var take = Input.OptionToInt("take");
         LastSearchType = LastSearchType.Track;
@@ -31,7 +31,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {tracks.Count} tracks with search phrase {SearchPhrase}");
         Write("You could create a playlist using this search result with the following command:");
-        WriteCodeExample("playlist","--create <name> --from-search");
+        WriteCodeExample("playlist","--create \"<name of your playlist>\"");
     }
 
     protected void Print(List<PowerCommandArtist> artists)
