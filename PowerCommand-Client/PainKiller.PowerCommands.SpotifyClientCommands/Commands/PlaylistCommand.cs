@@ -35,7 +35,7 @@ public class PlaylistCommand : SpotifyBaseCommando
         var user = await Client!.UserProfile.Current();
         try
         {
-            var playlist = await Client.Playlists.Create($"{user.Id}", new PlaylistCreateRequest(name) { Description = "Demo playlist", Collaborative = false, Public = false });
+            var playlist = await Client.Playlists.Create($"{user.Id}", new PlaylistCreateRequest(name) { Description = "Playlist created with Power Commands", Collaborative = false, Public = false });
             var chunkSize = 100;
             var chunkOfTracks = tracks.Take(chunkSize).ToList();
             var chunkCount = 0;

@@ -27,7 +27,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         var take = Input.OptionToInt("take");
         LastSearchType = LastSearchType.Track;
         LastSearchedTracks.AddRange(tracks);
-        var table = tracks.Select((t, index) => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Tags = t.Tags, Index = index++ }).Take(take == 0 ? 1000 : take);
+        var table = tracks.Select((t, index) => new TrackSearchTableItem { Artist = t.Artist, Name = t.Name, ReleaseDate = t.ReleaseDate, PlaylistName = t.PlaylistName, Popularity = t.Popularity, Tags = t.Tags, Index = index++ }).Take(take == 0 ? 1000 : take);
         ConsoleTableService.RenderTable(table, this);
         WriteHeadLine($"Found {tracks.Count} tracks with search phrase {SearchPhrase}");
         Write("You could create a playlist using this search result with the following command:");
@@ -59,4 +59,6 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         Write(ConfigurationGlobals.Prompt);
     }
     protected List<PowerCommandTrack> SearchTag(string search) => SpotifyDB.Tracks.Where(t => t.Tags.ToLower().Contains(search)).ToList();
+
+
 }

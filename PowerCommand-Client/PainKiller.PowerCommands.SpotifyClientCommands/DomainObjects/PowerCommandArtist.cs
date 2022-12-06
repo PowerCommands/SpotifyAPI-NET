@@ -14,8 +14,8 @@ public class PowerCommandArtist
         Uri = artist.Uri;
     }
     public List<string> Genres { get; set; } = new();
-    public string Id { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
     public int Popularity { get; set; }
-    public string Uri { get; set; }
+    public string Uri { get; set; } = "";
 }

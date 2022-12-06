@@ -12,7 +12,7 @@ public class SearchCommand : SpotifyBaseCommando
 {
     int pageCounter = 0;
     private int maxPageCount = 3;
-    private List<PowerCommandTrack> _tracks = new();
+    private readonly List<PowerCommandTrack> _tracks = new();
     public SearchCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override async Task<RunResult> RunAsync()
