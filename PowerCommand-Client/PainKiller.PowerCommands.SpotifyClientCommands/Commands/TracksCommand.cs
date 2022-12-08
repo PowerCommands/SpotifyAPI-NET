@@ -11,7 +11,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public class TracksCommand : SpotifyBaseCommando
 {
     protected int _pageCounter = 0;
-    protected const int MaxPageCount = 10;
+    protected int MaxPageCount = 10;
     protected readonly List<PowerCommandTrack> _tracks = new();
     public TracksCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
     public override async Task<RunResult> RunAsync()

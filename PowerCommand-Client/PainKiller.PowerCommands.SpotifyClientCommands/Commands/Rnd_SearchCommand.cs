@@ -1,3 +1,5 @@
+using PainKiller.PowerCommands.Shared.Extensions;
+using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
 using PainKiller.PowerCommands.SpotifyClientCommands.Extensions;
 using SpotifyAPI.Web;
 
@@ -5,7 +7,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Random a search that could be used to create a playlist or just added to the queue",
                         useAsync: true,
-                         options: "genre|artist|album|track|year|!count|queue",
+                         options: "genre|artist|album|track|year|!count|queue|distinct-artists",
                          example: "Random 100 tracks from your play-lists|random_search|//Random 50 tracks|random --count 50|//Random 100 track and add them to queue|random --queue")]
 // ReSharper disable once InconsistentNaming
 public class Rnd_SearchCommand : TracksCommand
@@ -18,13 +20,22 @@ public class Rnd_SearchCommand : TracksCommand
         _tracks.Clear();
         LastSearchedTracks.Clear();
         _pageCounter = 0;
+        MaxPageCount = 20;
+        var take = Input.OptionToInt("count") == 0 ? 100 : Input.OptionToInt("count");
 
         SearchPhrase = Input.BuildSearchPhrase();
         try
         {
             var searchResponse = await Client!.Search.Item(new SearchRequest(SearchRequest.Types.All, SearchPhrase));
             EnumerateTracks(searchResponse.Tracks);
-            Print(_tracks);
+            _tracks.Shuffle();
+            if (!HasOption("distinct-artists")) Print(_tracks.Take(take).ToList());
+            else
+            {
+                var distinctArtist = new List<PowerCommandTrack>();
+                foreach (var powerCommandTrack in _tracks) if(distinctArtist.All(a => a.ArtistId != powerCommandTrack.ArtistId)) distinctArtist.Add(powerCommandTrack);
+                Print(distinctArtist.Take(take).ToList());
+            }
         }
         catch (Exception ex)
         {
