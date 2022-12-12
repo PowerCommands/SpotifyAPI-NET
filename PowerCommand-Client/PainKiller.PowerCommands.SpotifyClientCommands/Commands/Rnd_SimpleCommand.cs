@@ -1,4 +1,5 @@
 using PainKiller.PowerCommands.SpotifyClientCommands.Contracts;
+using PainKiller.PowerCommands.SpotifyClientCommands.Extensions;
 using PainKiller.PowerCommands.SpotifyClientCommands.PlaylistAlgorithms;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
@@ -14,16 +15,15 @@ public class Rnd_SimpleCommand : QueueCommand
 
     public override async Task<RunResult> RunAsync()
     {
-        var take = Input.OptionToInt("count");
-        take = take == 0 ? 100 : take;
         var queue = HasOption("queue");
         LastSearchedTracks.Clear();
         IPlaylistAlgorithm algorithm;
-        if(HasOption("related")) algorithm= new AllRelated(this, take, queue);
-        else algorithm = new AllLocal(this, take, queue);
+        if(HasOption("related")) algorithm= new AllRelatedAlgorithm(this, Take, queue);
+        else algorithm = new AllLocalAlgorithm(this, Take, queue);
         try
         {
-            await algorithm.RunAsync();
+            var tracks = await algorithm.FindTracksAsync();
+            await tracks.AddToQueueOrJustShowResult(this);
         }
         catch (Exception ex)
         {

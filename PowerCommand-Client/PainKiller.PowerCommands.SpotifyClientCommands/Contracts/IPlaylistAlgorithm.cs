@@ -1,5 +1,7 @@
-﻿namespace PainKiller.PowerCommands.SpotifyClientCommands.Contracts;
+﻿using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
+
+namespace PainKiller.PowerCommands.SpotifyClientCommands.Contracts;
 public interface IPlaylistAlgorithm
 {
-    Task RunAsync();
+    Task<List<PowerCommandTrack>> FindTracksAsync();
 }

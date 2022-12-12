@@ -1,6 +1,3 @@
-using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
-using SpotifyAPI.Web;
-
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Add a track or playlist to the queue from a previous search",
@@ -23,13 +20,11 @@ public class QueueCommand : PlayingCommand
     protected async Task AddTracksToQueue()
     {
         var index =  int.TryParse(Input.SingleArgument, out var idx) ? idx : -1;
-        var tracks = new List<PowerCommandTrack>();
-        if(index > -1) tracks.Add(LastSearchedTracks[index]);
-        else tracks.AddRange(LastSearchedTracks);
-        foreach (var track in tracks)
+        if (index > -1)
         {
-            await (Client?.Player.AddToQueue(new PlayerAddToQueueRequest(track.Uri))!).ConfigureAwait(false);
-            WriteSuccessLine($"player queued track {track.Artist} {track.Name} released: {track.ReleaseYear}");
+            await AddTracksToQueue(LastSearchedTracks[index]);
+            return;
         }
+        foreach (var track in LastSearchedTracks) await AddTracksToQueue(track);
     }
 }

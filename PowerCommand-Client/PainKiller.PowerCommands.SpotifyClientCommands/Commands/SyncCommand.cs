@@ -30,7 +30,7 @@ public class SyncCommand : SpotifyBaseCommando
         SpotifyDB.Updated = DateTime.Now;
         SyncTags();
         StorageService<SpotifyDB>.Service.StoreObject(SpotifyDB);
-        WriteLine($"{SpotifyDB.Tracks} number of unique tracks found.");
+        WriteLine($"{SpotifyDB.Tracks.Count} number of unique tracks found.");
         WriteSuccessLine("The playlist are now downloaded and stored locally, earlier stored tags (if any) are restored.");
         Write(ConfigurationGlobals.Prompt);
         return Ok();

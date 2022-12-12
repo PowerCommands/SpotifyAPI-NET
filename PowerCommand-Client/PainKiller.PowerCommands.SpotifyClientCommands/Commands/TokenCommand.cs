@@ -9,8 +9,7 @@ public class TokenCommand : CommandBase<PowerCommandsConfiguration>
     public TokenCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
     public override RunResult Run()
     {
-        var openDialog = DialogService.YesNoDialog("You will need this permissions: [playlist-read-private] [playlist-modify-private] [user-read-currently-playing] [user-modify-playback-state] [user-read-playback-state] [user-read-recently-played], hit enter to open the Spotify API page and create a token.\nOpen API page now? (y)");
-        if (openDialog) ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/post-playlists/");
+        ShellService.Service.OpenWithDefaultProgram("https://developer.spotify.com/console/post-playlists/");
         var token = DialogService.QuestionAnswerDialog("Paste your permission token");
         StorageService<Token>.Service.StoreObject(new Token { OathToken = token });
         WriteSuccessLine("Token saved");

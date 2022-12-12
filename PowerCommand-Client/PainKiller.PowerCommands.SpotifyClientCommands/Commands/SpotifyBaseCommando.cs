@@ -4,22 +4,30 @@ using SpotifyAPI.Web;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfiguration>
 {
+    public int Take { get; private set; }
+    public bool AddToQueue { get; private set; }
+
     public string SearchPhrase = "";
     public static LastSearchType LastSearchType = LastSearchType.None;
     public bool NoClient;
     public static SpotifyDB SpotifyDB = new();
     public SpotifyClient? Client;
+    
     public static List<PowerCommandTrack> LastSearchedTracks = new();
     public static List<PowerCommandArtist> LastSearchedArtists = new();
     protected SpotifyBaseCommando(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
     {
+        var retVal = base.InitializeAndValidateInput(input, designAttribute);
+        Take = Input.OptionToInt("take");
+        AddToQueue = HasOption("queue");
         SpotifyDB = StorageService<SpotifyDB?>.Service.GetObject() ?? new SpotifyDB();
         if (NoClient) return base.InitializeAndValidateInput(input, designAttribute);
         var token = StorageService<Token>.Service.GetObject().OathToken;
         Client = new SpotifyClient($"{token}");
-        return base.InitializeAndValidateInput(input, designAttribute);
+        
+        return retVal;
     }
 
     public void Print(List<PowerCommandTrack> tracks)
@@ -47,7 +55,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         WriteCodeExample("artist","--tracks 0");
     }
 
-    protected void Print(List<PowerCommandPlaylist> playlists)
+    public void Print(List<PowerCommandPlaylist> playlists)
     {
         var take = Input.OptionToInt("take", 1000);
         LastSearchType = LastSearchType.Playlist;
@@ -59,6 +67,9 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
         Write(ConfigurationGlobals.Prompt);
     }
     protected List<PowerCommandTrack> SearchTag(string search) => SpotifyDB.Tracks.Where(t => t.Tags.ToLower().Contains(search)).ToList();
-
-
+    public async Task AddTracksToQueue(PowerCommandTrack track)
+    {
+        await (Client?.Player.AddToQueue(new PlayerAddToQueueRequest(track.Uri))!).ConfigureAwait(false);
+        WriteSuccessLine($"player queued track {track.Artist} {track.Name} released: {track.ReleaseYear}");
+    }
 }

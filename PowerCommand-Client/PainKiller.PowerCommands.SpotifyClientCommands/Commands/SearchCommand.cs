@@ -1,11 +1,12 @@
 using PainKiller.PowerCommands.SpotifyClientCommands.DomainObjects;
+using PainKiller.PowerCommands.SpotifyClientCommands.Extensions;
 using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Search the Spotify catalog",
                        arguments: "<search1> <search2> <search2> and so on...",
-                         options: "artist|track|album|!year|!genre|begins-with|!page-count",
+                         options: "!genre|artist|track|album|!year|begins-with|!page-count",
                         useAsync: true,
                          example: "search \"balls to the wall\" --title")]
 public class SearchCommand : SpotifyBaseCommando
@@ -21,9 +22,8 @@ public class SearchCommand : SpotifyBaseCommando
         _tracks.Clear();
         LastSearchedTracks.Clear();
 
-        var search = Input.SingleQuote.ToLower();
-        if (string.IsNullOrEmpty(search)) search = string.Join(' ', Input.Arguments);
-        SearchPhrase = search;
+        
+        SearchPhrase = Input.BuildSearchPhrase();
 
         var searchType = SearchRequest.Types.All;
 
@@ -33,10 +33,8 @@ public class SearchCommand : SpotifyBaseCommando
         else if(HasOption("artist")) searchType = SearchRequest.Types.Artist;
         pageCounter = 0;
         if (HasOption("page-count")) maxPageCount = Input.OptionToInt("page-count");
-        if(HasOption("genre")) search = $"{search} genre:{GetOptionValue("genre")}";
-        if(HasOption("track") && HasOption("artist")) search = $"{search} artist:{GetOptionValue("artist")}";
 
-        var searchResponse = await Client!.Search.Item(new SearchRequest(searchType, search));
+        var searchResponse = await Client!.Search.Item(new SearchRequest(searchType, SearchPhrase));
         
         switch (searchType)
         {

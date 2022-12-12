@@ -5,32 +5,26 @@ using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.PlaylistAlgorithms;
 
-public class AllRelatedAlgorithm : TracksAlgorithmBase, IPlaylistAlgorithm
+public class RelatedSearchAlgorithm : TracksAlgorithmBase, IPlaylistAlgorithm
 {
-    private readonly int _take;
-    private readonly bool _queue;
-
-    public AllRelatedAlgorithm(SpotifyBaseCommando spotifyBaseCommando, int take, bool queue) : base(spotifyBaseCommando)
+    public RelatedSearchAlgorithm(SpotifyBaseCommando spotifyBaseCommando) : base(spotifyBaseCommando)
     {
-        _take = take;
-        _queue = queue;
+        
     }
     public async Task<List<PowerCommandTrack>> FindTracksAsync()
     {
         var rand = new Random();
-        var artists = new List<PowerCommandArtist>();
-        for (int i = 0; i < _take; i++)
-        {
-            var trackIndex = rand.Next(0, Db.Artists.Count - 1);
-            var artist = Db.Artists[trackIndex];
-            artists.Add(artist);
-        }
-        Writer.WriteLine("Artists found");
-        foreach (var artist in artists)
+        var tracks = new List<PowerCommandTrack>();
+        tracks.AddRange(SpotifyBaseCommando.LastSearchedTracks);
+        SpotifyBaseCommando.LastSearchedTracks.Clear();
+        var artistsIds = tracks.Select(t => rand.Next(0, tracks.Count - 1)).Select(trackIndex => tracks[trackIndex].ArtistId).ToList();
+
+        var related = new List<PowerCommandTrack>();
+        foreach (var artist in artistsIds)
         {
             try
             {
-                var relatedArtistResponse = await Client.Artists.GetRelatedArtists(artist.Id);
+                var relatedArtistResponse = await Client.Artists.GetRelatedArtists(artist);
                 var artistIndex = rand.Next(0, relatedArtistResponse.Artists.Count - 1);
                 if (relatedArtistResponse.Artists.Count == 0) continue;
                 var reletedArtist = relatedArtistResponse.Artists[artistIndex];
@@ -38,11 +32,10 @@ public class AllRelatedAlgorithm : TracksAlgorithmBase, IPlaylistAlgorithm
                 var trackIndex = rand.Next(0, reletaedTracks.Tracks.Count - 1);
                 if (reletaedTracks.Tracks.Count == 0) continue;
                 var relatedTrack = reletaedTracks.Tracks[trackIndex];
-                ResultTracks.Add(new PowerCommandTrack(relatedTrack, "random"));
+                related.Add(new PowerCommandTrack(relatedTrack, "random"));
             }
             catch{ Writer.WriteFailure("No related artist or related track found");}
         }
-        if (_queue) await AddTracksToQueue(-1);
-        return ResultTracks;
+        return related;
     }
 }
