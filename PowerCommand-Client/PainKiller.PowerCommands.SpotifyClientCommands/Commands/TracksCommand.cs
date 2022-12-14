@@ -5,7 +5,7 @@ using SpotifyAPI.Web;
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
 [PowerCommandDesign( description: "Search tracks",
-                         options: "genre|artist|album|track|year",
+                         options: "genre|artist|album|track|year|distinct-artists",
                         useAsync: true,
                          example: "tracks --genre \"hard rock\"")]
 public class TracksCommand : SpotifyBaseCommando
@@ -20,12 +20,22 @@ public class TracksCommand : SpotifyBaseCommando
         _tracks.Clear();
         LastSearchedTracks.Clear();
         _pageCounter = 0;
-
         SearchPhrase = Input.BuildSearchPhrase();
         try
         {
             var searchResponse = await Client!.Search.Item(new SearchRequest(SearchRequest.Types.Track, SearchPhrase));
             EnumerateTracks(searchResponse.Tracks);
+            if (HasOption("distinct-artists"))
+            {
+                var distinctArtistTracks = new List<PowerCommandTrack>();
+                foreach (var track in _tracks)
+                {
+                    if(distinctArtistTracks.Any(t => t.ArtistId == track.ArtistId)) continue;
+                    distinctArtistTracks.Add(track);
+                }
+                _tracks.Clear();
+                _tracks.AddRange(distinctArtistTracks);
+            }
             Print(_tracks);
         }
         catch (Exception ex)
