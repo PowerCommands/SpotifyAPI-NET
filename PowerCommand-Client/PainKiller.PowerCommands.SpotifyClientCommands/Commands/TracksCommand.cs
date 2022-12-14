@@ -44,6 +44,7 @@ public class TracksCommand : SpotifyBaseCommando
             WriteError(ex.Message);
         }
         EnableLog();
+        Write(ConfigurationGlobals.Prompt);
         return Ok();
     }
     protected void EnumerateTracks(Paging<FullTrack, SearchResponse> page)

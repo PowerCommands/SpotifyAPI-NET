@@ -5,14 +5,14 @@ using SpotifyAPI.Web;
 
 namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 
-[PowerCommandDesign( description: "Random a search that could be used to create a playlist or just added to the queue",
+[PowerCommandDesign( description: "Randomize a search for tracks that could be used to create a playlist or just added to the queue",
                         useAsync: true,
                          options: "genre|artist|album|track|year|distinct-artists",
                          example: "Random 100 tracks from a Spotify search|random_search|//Random 50 tracks|random --count 50|//Random 100 track and add them to queue|random --queue")]
 // ReSharper disable once InconsistentNaming
-public class Rnd_SearchCommand : TracksCommand
+public class Rnd_TracksSearchCommand : TracksCommand
 {
-    public Rnd_SearchCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
+    public Rnd_TracksSearchCommand(string identifier, PowerCommandsConfiguration configuration) : base(identifier, configuration) { }
 
     public override async Task<RunResult> RunAsync()
     {
@@ -20,28 +20,24 @@ public class Rnd_SearchCommand : TracksCommand
         _tracks.Clear();
         LastSearchedTracks.Clear();
         _pageCounter = 0;
-        MaxPageCount = 20;
-
         SearchPhrase = Input.BuildSearchPhrase();
         try
         {
-            var searchResponse = await Client!.Search.Item(new SearchRequest(SearchRequest.Types.All, SearchPhrase));
+            var searchResponse = await Client!.Search.Item(new SearchRequest(SearchRequest.Types.Track, SearchPhrase));
             EnumerateTracks(searchResponse.Tracks);
             _tracks.Shuffle();
-            if (!HasOption("distinct-artists")) Print(_tracks.Take(Take).ToList());
-            else
+            if (HasOption("distinct-artists"))
             {
-                var distinctArtist = new List<PowerCommandTrack>();
-                foreach (var powerCommandTrack in _tracks)
+                var distinctArtistTracks = new List<PowerCommandTrack>();
+                foreach (var track in _tracks)
                 {
-                    if (distinctArtist.All(a => a.ArtistId != powerCommandTrack.ArtistId))
-                    {
-                        distinctArtist.Add(powerCommandTrack);
-                        if (AddToQueue) await AddTracksToQueue(powerCommandTrack);
-                    }
+                    if(distinctArtistTracks.Any(t => t.ArtistId == track.ArtistId)) continue;
+                    distinctArtistTracks.Add(track);
                 }
-                if(!AddToQueue) Print(distinctArtist.Take(Take).ToList());
+                _tracks.Clear();
+                _tracks.AddRange(distinctArtistTracks);
             }
+            Print(_tracks);
         }
         catch (Exception ex)
         {
