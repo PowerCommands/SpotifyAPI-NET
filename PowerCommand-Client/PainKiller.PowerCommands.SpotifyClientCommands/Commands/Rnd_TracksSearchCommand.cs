@@ -8,7 +8,7 @@ namespace PainKiller.PowerCommands.SpotifyClientCommands.Commands;
 [PowerCommandDesign( description: "Randomize a search for tracks that could be used to create a playlist or just added to the queue",
                         useAsync: true,
                          options: "genre|artist|album|track|year|distinct-artists",
-                         example: "Random 100 tracks from a Spotify search|random_search|//Random 50 tracks|random --count 50|//Random 100 track and add them to queue|random --queue")]
+                         example: "//Random 100 tracks from a Spotify genre rock|rnd_tracksearch --genre rock")]
 // ReSharper disable once InconsistentNaming
 public class Rnd_TracksSearchCommand : TracksCommand
 {
