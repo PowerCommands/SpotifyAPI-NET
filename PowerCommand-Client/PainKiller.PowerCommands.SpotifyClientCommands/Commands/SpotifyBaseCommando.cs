@@ -20,7 +20,7 @@ public abstract class SpotifyBaseCommando : CommandBase<PowerCommandsConfigurati
     public override bool InitializeAndValidateInput(ICommandLineInput input, PowerCommandDesignAttribute? designAttribute = null)
     {
         var retVal = base.InitializeAndValidateInput(input, designAttribute);
-        Take = Input.OptionToInt("take");
+        Take = Input.OptionToInt("take", 100);
         AddToQueue = HasOption("queue");
         SpotifyDB = StorageService<SpotifyDB?>.Service.GetObject() ?? new SpotifyDB();
         if (NoClient) return base.InitializeAndValidateInput(input, designAttribute);
